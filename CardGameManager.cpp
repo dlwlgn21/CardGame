@@ -98,41 +98,8 @@ void CardGameManager::OnClick(D2D1_POINT_2F point)
         else
         {
             Render();
-            if (pCurCard->GetCardType() == mpPrevCard->GetCardType() && pCurCard != mpPrevCard)
-            {
-                Sleep(STOP_MILEE_SEC);
-                auto iter = mList.begin();
-                while (iter != mList.end())
-                {
-                    if ((*iter)->IsFront())
-                    {
-                        iter = mList.erase(iter);
-                    }
-                    else
-                    {
-                        ++iter;
-                    }
-                }
-                mpPrevCard = nullptr;
-                if (mList.empty())
-                {
-                    DestroyWindow(mHwnd);
-                }
-            }
-            else
-            {
-                if (pCurCard == mpPrevCard)
-                {
-                    mpPrevCard = nullptr;
-                }
-                else
-                {
-                    Sleep(STOP_MILEE_SEC);
-                    pCurCard->Flip();
-                    mpPrevCard->Flip();
-                    mpPrevCard = nullptr;
-                }
-            }
+            if (EraseIfMatched(&pCurCard, &mpPrevCard)){}
+            else { RollBack(&pCurCard, &mpPrevCard); }
         }
 
     }
@@ -175,6 +142,50 @@ void CardGameManager::initCardPos()
             mList.push_front(std::make_unique<Card>(this, cardTypes[typeIdx++]));
             mList.front()->SetPostition(CARD_X_DISTANCE * j + PADDING_X,  CARD_Y_DISTANCE * i + PADDING_Y);
         }
+    }
+
+}
+
+bool CardGameManager::EraseIfMatched(Card** ppCurCard, Card** ppPrevCard)
+{
+    if ((*ppCurCard)->GetCardType() == (*ppPrevCard)->GetCardType() && *ppCurCard != *ppPrevCard)
+    {
+        Sleep(STOP_MILEE_SEC);
+        auto iter = mList.begin();
+        while (iter != mList.end())
+        {
+            if ((*iter)->IsFront())
+            {
+                iter = mList.erase(iter);
+            }
+            else
+            {
+                ++iter;
+            }
+        }
+        *ppPrevCard = nullptr;
+        if (mList.empty())
+        {
+            DestroyWindow(mHwnd);
+        }
+        return true;
+    }
+
+    return false;
+}
+
+void CardGameManager::RollBack(Card** ppCurCard, Card** ppPrevCard)
+{
+    if (*ppCurCard == *ppPrevCard)
+    {
+        *ppPrevCard = nullptr;
+    }
+    else
+    {
+        Sleep(STOP_MILEE_SEC);
+        (*ppCurCard)->Flip();
+        (*ppPrevCard)->Flip();
+        *ppPrevCard = nullptr;
     }
 
 }

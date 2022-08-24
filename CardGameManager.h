@@ -33,7 +33,8 @@ public:
 
 private:
 	void initCardPos();
-
+	bool EraseIfMatched(Card** ppCurCard, Card** ppPrevCard);
+	void RollBack(Card** ppCurCard, Card** ppPrevCard);
 private:
 	std::unique_ptr<Actor> mspBackImg;
 	std::list<std::unique_ptr<Card>> mList;
