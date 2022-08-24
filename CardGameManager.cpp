@@ -79,7 +79,6 @@ void CardGameManager::OnClick(D2D1_POINT_2F point)
     OutputDebugStringA(buffer);
 
     Card* pCurCard = nullptr;
-
     for (auto& e : mList)
     {
         if (e->IsClicked(point))
