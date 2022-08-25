@@ -16,13 +16,13 @@ public:
 	const int STOP_MILEE_SEC = 500;
 
 	// CARD SECTION
-	const int MAX_CARD_COUNT = 20;
+	const int MAX_CARD_COUNT = 10;
 	const int COL_COUNT = 5;
-	const int ROW_COUNT = 4;
-	const float CARD_X_DISTANCE = 140.f;
-	const float CARD_Y_DISTANCE = 150.f;
+	const int ROW_COUNT = 2;
+	const float CARD_X_DISTANCE = 135.f;
+	const float CARD_Y_DISTANCE = 300.f;
 	const int PADDING_X = 50;
-	const int PADDING_Y = 50;
+	const int PADDING_Y = 200;
 
 
 public:

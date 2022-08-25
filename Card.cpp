@@ -8,7 +8,7 @@ const wchar_t Card::QUEEN_IMG_FILENAME[MAX_STR_COUNT] = L"Data/QueenColor.png";
 const wchar_t Card::JACK_IMG_FILENAME[MAX_STR_COUNT] = L"Data/JackColor.png";
 Card::Card(D2DFramework* pFramework, const eCardType type)
 	: Actor(pFramework, CARD_BACK_IMG_FILENAME)
-	, mCardType{type}
+	, mCardType{ type }
 	, mBIsFront{ false }
 {
 	switch (mCardType)

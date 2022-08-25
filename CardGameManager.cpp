@@ -152,12 +152,19 @@ void CardGameManager::initCardPos()
     std::shuffle(cardTypes.begin(), cardTypes.end(), gen);
 
     int typeIdx = 0;
-    for (int i = 0; i < ROW_COUNT; ++i)
+    for (int i = 1; i <= ROW_COUNT; ++i)
     {
         for (int j = 1; j <= COL_COUNT; ++j)
         {
             mList.push_front(std::make_unique<Card>(this, cardTypes[typeIdx++]));
-            mList.front()->SetPostition(CARD_X_DISTANCE * j + PADDING_X,  CARD_Y_DISTANCE * i + PADDING_Y);
+            if (i == 1)
+            {
+                mList.front()->SetPostition(CARD_X_DISTANCE * j + PADDING_X,  CARD_Y_DISTANCE * i);
+            }
+            else
+            {
+                mList.front()->SetPostition(CARD_X_DISTANCE * j + PADDING_X, CARD_Y_DISTANCE + PADDING_Y);
+            }
         }
     }
 

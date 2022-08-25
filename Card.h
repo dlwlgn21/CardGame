@@ -28,7 +28,6 @@ public:
 			0, 0,
 			static_cast<float>(size.width),
 			static_cast<float>(size.height)
-
 		};
 
 		D2D1::Matrix3x2F matTranslation = D2D1::Matrix3x2F::Translation(mX, mY);
@@ -42,6 +41,7 @@ public:
 			mpFramework->GetRT()->DrawBitmap(mpBitmap, rect, mOpacity);
 		}
 	}
+
 	inline bool IsClicked(const D2D1_POINT_2F point) 
 	{
 		D2D1_SIZE_U size{ mpFront->GetPixelSize() };
@@ -53,6 +53,7 @@ public:
 		}
 		return false;
 	}
+
 	inline bool IsFront() const { return mBIsFront; }
 	inline eCardType GetCardType() const { return mCardType; }
 	inline void Flip() { mBIsFront = !mBIsFront; }
