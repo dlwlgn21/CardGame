@@ -2,10 +2,10 @@
 #include "Card.h"
 #include "BitmapManager.h"
 
-const wchar_t Card::CARD_BACK_IMG_FILENAME[] = L"Data/card_back.png";
-const wchar_t Card::DRAGON_IMG_FILENAME[MAX_STR_COUNT] = L"Data/card_creature_dragon.png";
-const wchar_t Card::WOLF_IMG_FILENAME[MAX_STR_COUNT] = L"Data/card_creature_wolf.png";
-const wchar_t Card::BEAR_IMG_FILENAME[MAX_STR_COUNT] = L"Data/card_creature_bear.png";
+const wchar_t Card::CARD_BACK_IMG_FILENAME[] = L"Data/BackBlack.png";
+const wchar_t Card::KING_IMG_FILENAME[MAX_STR_COUNT] = L"Data/KingColor.png";
+const wchar_t Card::QUEEN_IMG_FILENAME[MAX_STR_COUNT] = L"Data/QueenColor.png";
+const wchar_t Card::JACK_IMG_FILENAME[MAX_STR_COUNT] = L"Data/JackColor.png";
 Card::Card(D2DFramework* pFramework, const eCardType type)
 	: Actor(pFramework, CARD_BACK_IMG_FILENAME)
 	, mCardType{type}
@@ -13,14 +13,14 @@ Card::Card(D2DFramework* pFramework, const eCardType type)
 {
 	switch (mCardType)
 	{
-	case eCardType::DRAGON:
-		mpFront = BitmapManager::GetInstance().LoadBitmapW(DRAGON_IMG_FILENAME);
+	case eCardType::KING:
+		mpFront = BitmapManager::GetInstance().LoadBitmapW(KING_IMG_FILENAME);
 		break;
-	case eCardType::WOLF:
-		mpFront = BitmapManager::GetInstance().LoadBitmapW(WOLF_IMG_FILENAME);
+	case eCardType::QUEEN:
+		mpFront = BitmapManager::GetInstance().LoadBitmapW(QUEEN_IMG_FILENAME);
 		break;
-	case eCardType::BEAR:
-		mpFront = BitmapManager::GetInstance().LoadBitmapW(BEAR_IMG_FILENAME);
+	case eCardType::JACK:
+		mpFront = BitmapManager::GetInstance().LoadBitmapW(JACK_IMG_FILENAME);
 		break;
 	default:
 		assert(false);

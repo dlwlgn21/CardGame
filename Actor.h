@@ -9,7 +9,7 @@ class Actor
 public:
 	Actor(D2DFramework* pFramework, const std::wstring filename);
 	
-	void Draw();
+	virtual void Draw();
 
 	inline D2D1_POINT_2F GetPosition() const { return D2D1_POINT_2F{ mX, mY }; }
 	inline void SetPostition(D2D1_POINT_2F pos) 

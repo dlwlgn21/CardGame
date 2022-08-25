@@ -5,7 +5,7 @@
 #include <cstring>
 #include "CardGameManager.h"
 
-const wchar_t CardGameManager::BACK_IMG_FILENAME[] = L"Data/bg_blank.png";
+const wchar_t CardGameManager::BACK_IMG_FILENAME[] = L"Data/InGame.jpg";
 
 HRESULT CardGameManager::Initialize(HINSTANCE hInstance, LPCWSTR title, UINT width, UINT height)
 {
@@ -13,6 +13,8 @@ HRESULT CardGameManager::Initialize(HINSTANCE hInstance, LPCWSTR title, UINT wid
     if (FAILED(hr)) { assert(false); }
 
     mspBackImg = std::make_unique<Actor>(this, BACK_IMG_FILENAME);
+    mspStartGameMenu = std::make_unique<StartGameMenu>(this);
+    mBIsStartFisrt = true;
     initCardPos();
     return S_OK;
 }
@@ -22,13 +24,22 @@ void CardGameManager::Render()
     HRESULT hr;
     mcpRenderTarget->BeginDraw();
     mcpRenderTarget->SetTransform(D2D1::Matrix3x2F::Identity());
-    mcpRenderTarget->Clear(D2D1::ColorF(0.f, 0.2f, 0.5f, 1.f));
+    mcpRenderTarget->Clear(D2D1::ColorF(0.9f, 1.0f, 1.0f, 1.f));
+    if (mBIsStartFisrt)
+    {
+        mspStartGameMenu->Draw();
+        goto END_DRAW;
+    }
+
+
     mspBackImg->Draw();
     for (auto& e : mList)
     {
         e->Draw();
     }
 
+
+END_DRAW:
     hr = mcpRenderTarget->EndDraw();
     if (hr == D2DERR_RECREATE_TARGET)
     {
@@ -38,6 +49,7 @@ void CardGameManager::Render()
 
 void CardGameManager::Release()
 {
+    mspStartGameMenu.reset();
     mspBackImg.reset();
     mList.clear();
     D2DFramework::Release();
@@ -73,10 +85,16 @@ int CardGameManager::GameLoop()
 
 void CardGameManager::OnClick(D2D1_POINT_2F point)
 {
+    // For Debbuing
     char buffer[MAX_STR_COUNT];
-
     sprintf(buffer, "%2f, %2f\n", point.x, point.y);
     OutputDebugStringA(buffer);
+
+    if (mBIsStartFisrt)
+    {
+        IsStartBtnClicked(point);
+        return;
+    }
 
     Card* pCurCard = nullptr;
     for (auto& e : mList)
@@ -113,18 +131,18 @@ void CardGameManager::initCardPos()
     {
         if (i % static_cast<int>(eCardType::COUNT) == 0)
         {
-            cardTypes.push_back(eCardType::DRAGON);
-            cardTypes.push_back(eCardType::DRAGON);
+            cardTypes.push_back(eCardType::KING);
+            cardTypes.push_back(eCardType::KING);
         }
         else if (i % static_cast<int>(eCardType::COUNT) == 1)
         {
-            cardTypes.push_back(eCardType::WOLF);
-            cardTypes.push_back(eCardType::WOLF);
+            cardTypes.push_back(eCardType::QUEEN);
+            cardTypes.push_back(eCardType::QUEEN);
         }
         else
         {
-            cardTypes.push_back(eCardType::BEAR);
-            cardTypes.push_back(eCardType::BEAR);
+            cardTypes.push_back(eCardType::JACK);
+            cardTypes.push_back(eCardType::JACK);
         }
     }
 
@@ -187,4 +205,19 @@ void CardGameManager::RollBack(Card** ppCurCard, Card** ppPrevCard)
         *ppPrevCard = nullptr;
     }
 
+}
+
+void CardGameManager::IsStartBtnClicked(D2D1_POINT_2F point)
+{
+    mspStartGameMenu->OnClick(point);
+    if (mspStartGameMenu->GetStartClicked())
+    {
+        mBIsStartFisrt = false;
+        return;
+    }
+    if (mspStartGameMenu->GetExitClicked())
+    {
+        DestroyWindow(mHwnd);
+        return;
+    }
 }

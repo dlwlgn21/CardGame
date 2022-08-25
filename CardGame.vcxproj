@@ -144,6 +144,7 @@
     <ClCompile Include="Card.cpp" />
     <ClCompile Include="CardGameManager.cpp" />
     <ClCompile Include="D2DFramework.cpp" />
+    <ClCompile Include="StartGameMenu.cpp" />
     <ClCompile Include="WinMain.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -152,6 +153,7 @@
     <ClInclude Include="Card.h" />
     <ClInclude Include="CardGameManager.h" />
     <ClInclude Include="D2DFramework.h" />
+    <ClInclude Include="StartGameMenu.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

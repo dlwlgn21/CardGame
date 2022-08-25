@@ -3,25 +3,25 @@
 
 enum class eCardType 
 {
-	DRAGON,
-	WOLF,
-	BEAR,
+	KING,
+	QUEEN,
+	JACK,
 	COUNT
 };
 
 class Card final : public Actor
 {
 public:
-	enum {MAX_STR_COUNT = 64};
+	enum {MAX_STR_COUNT = 32};
 	static const wchar_t CARD_BACK_IMG_FILENAME[MAX_STR_COUNT];
-	const static wchar_t DRAGON_IMG_FILENAME[MAX_STR_COUNT];
-	const static wchar_t WOLF_IMG_FILENAME[MAX_STR_COUNT];
-	const static wchar_t BEAR_IMG_FILENAME[MAX_STR_COUNT];
+	const static wchar_t KING_IMG_FILENAME[MAX_STR_COUNT];
+	const static wchar_t QUEEN_IMG_FILENAME[MAX_STR_COUNT];
+	const static wchar_t JACK_IMG_FILENAME[MAX_STR_COUNT];
 
 public:
 	Card(D2DFramework* pFramework, const eCardType type);
 
-	inline virtual void Draw() 
+	inline virtual void Draw() override 
 	{
 		D2D1_SIZE_U size{ mpFront->GetPixelSize() };
 		D2D1_RECT_F rect{
