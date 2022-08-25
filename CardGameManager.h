@@ -4,6 +4,7 @@
 #include <string>
 #include "Card.h"
 #include "StartGameMenu.h"
+#include "YesNoBox.h"
 
 class CardGameManager final : public D2DFramework
 {
@@ -37,11 +38,12 @@ private:
 	void initCardPos();
 	bool EraseIfMatched(Card** ppCurCard, Card** ppPrevCard);
 	void RollBack(Card** ppCurCard, Card** ppPrevCard);
-	void IsStartBtnClicked(D2D1_POINT_2F point);
-
+	void IfStartBtnClicked(D2D1_POINT_2F point);
+	void IfYesNoBtnClicked(D2D1_POINT_2F point);
 private:
 	std::unique_ptr<Actor> mspBackImg;
 	std::unique_ptr<StartGameMenu> mspStartGameMenu;
+	std::unique_ptr<YesNoBox> mspYesNoBox;
 	std::list<std::unique_ptr<Card>> mList;
 	Card* mpPrevCard{ nullptr };
 	bool mBIsStartFisrt;

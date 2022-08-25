@@ -15,6 +15,7 @@ HRESULT CardGameManager::Initialize(HINSTANCE hInstance, LPCWSTR title, UINT wid
     mspBackImg = std::make_unique<Actor>(this, BACK_IMG_FILENAME);
     mspStartGameMenu = std::make_unique<StartGameMenu>(this);
     mBIsStartFisrt = true;
+    mspYesNoBox = std::make_unique<YesNoBox>(this);
     initCardPos();
     return S_OK;
 }
@@ -33,10 +34,11 @@ void CardGameManager::Render()
 
 
     mspBackImg->Draw();
-    for (auto& e : mList)
+    mspYesNoBox->Draw();
+    /*for (auto& e : mList)
     {
         e->Draw();
-    }
+    }*/
 
 
 END_DRAW:
@@ -49,8 +51,9 @@ END_DRAW:
 
 void CardGameManager::Release()
 {
-    mspStartGameMenu.reset();
     mspBackImg.reset();
+    mspYesNoBox.reset();
+    mspStartGameMenu.reset();
     mList.clear();
     D2DFramework::Release();
 }
@@ -92,9 +95,11 @@ void CardGameManager::OnClick(D2D1_POINT_2F point)
 
     if (mBIsStartFisrt)
     {
-        IsStartBtnClicked(point);
+        IfStartBtnClicked(point);
         return;
     }
+
+    IfYesNoBtnClicked(point);
 
     Card* pCurCard = nullptr;
     for (auto& e : mList)
@@ -214,7 +219,7 @@ void CardGameManager::RollBack(Card** ppCurCard, Card** ppPrevCard)
 
 }
 
-void CardGameManager::IsStartBtnClicked(D2D1_POINT_2F point)
+void CardGameManager::IfStartBtnClicked(D2D1_POINT_2F point)
 {
     mspStartGameMenu->OnClick(point);
     if (mspStartGameMenu->GetStartClicked())
@@ -223,6 +228,21 @@ void CardGameManager::IsStartBtnClicked(D2D1_POINT_2F point)
         return;
     }
     if (mspStartGameMenu->GetExitClicked())
+    {
+        DestroyWindow(mHwnd);
+        return;
+    }
+}
+
+void CardGameManager::IfYesNoBtnClicked(D2D1_POINT_2F point)
+{
+    mspYesNoBox->OnClicked(point);
+    if (mspYesNoBox->IsYesClicked())
+    {
+        MessageBoxA(nullptr, "Clicked!!!", "YES", MB_OK);
+        return;
+    }
+    if (mspYesNoBox->IsNoClicked())
     {
         DestroyWindow(mHwnd);
         return;

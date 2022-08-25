@@ -36,6 +36,9 @@
     <ClCompile Include="StartGameMenu.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="YesNoBox.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BitmapManager.h">
@@ -54,6 +57,9 @@
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="StartGameMenu.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="YesNoBox.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
   </ItemGroup>
