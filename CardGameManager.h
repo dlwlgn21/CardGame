@@ -91,7 +91,7 @@ private:
 		);
 	}
 
-	inline void drawInGmaeText(const wchar_t* text, int num, const float x, const float y, const float width, const float height)
+	inline void drawInGameText(const wchar_t* text, int num, const float x, const float y, const float width, const float height)
 	{
 		assert(num < 100);
 		wchar_t buf[MAX_NUM_COUNT];
@@ -110,7 +110,7 @@ private:
 		}
 		else if (num > 5)
 		{
-			mcpBrush->SetColor(D2D1::ColorF(D2D1::ColorF::Yellow));
+			mcpBrush->SetColor(D2D1::ColorF(D2D1::ColorF::BlueViolet));
 		}
 		else
 		{
