@@ -5,18 +5,24 @@
 #include <cstring>
 #include "CardGameManager.h"
 
-const wchar_t CardGameManager::BACK_IMG_FILENAME[] = L"Data/InGame.jpg";
+#pragma comment (lib, "Dwrite.lib")
 
 HRESULT CardGameManager::Initialize(HINSTANCE hInstance, LPCWSTR title, UINT width, UINT height)
 {
     HRESULT hr = D2DFramework::Initialize(hInstance, title, width, height);
     if (FAILED(hr)) { assert(false); }
+    hr = createDeviceIndependentResources();
+    if (FAILED(hr)) { assert(false); }
 
     mspBackImg = std::make_unique<Actor>(this, BACK_IMG_FILENAME);
     mspStartGameMenu = std::make_unique<StartGameMenu>(this);
-    mBIsStartFisrt = true;
     mspYesNoBox = std::make_unique<YesNoBox>(this);
+    mBIsStartFisrt = true;
+    mBIsYesNoBoxPresent = false;
     initCardPos();
+    mCurGameLevel = 1;
+    mLeftFilpCount = 20;
+    
     return S_OK;
 }
 
@@ -29,16 +35,38 @@ void CardGameManager::Render()
     if (mBIsStartFisrt)
     {
         mspStartGameMenu->Draw();
+        drawText(GAME_TITLE_TEXT, GAME_TITLE_X_POS, GAME_TITLE_Y_POS, GAME_TITLE_WIDTH, GAME_TITLE_HEIGHT);
         goto END_DRAW;
     }
 
+    if (mBIsYesNoBoxPresent)
+    {
+        mspYesNoBox->Draw();
+        if (!mList.empty())
+        {
+            drawText(AGAIN_TEXT, NEXT_LEVEL_X_POS + 70.f, NEXT_LEVEL_Y_POS, NEXT_LEVEL_WIDTH + 70.f, NEXT_LEVEL_HEIGHT);
+            goto END_DRAW;
+        }
+        if (mCurGameLevel == MAX_GAME_LEVEL && mList.empty())
+        {
+            drawText(CLEAR_TEXT, NEXT_LEVEL_X_POS + 30.f, NEXT_LEVEL_Y_POS, NEXT_LEVEL_WIDTH + 30.f, NEXT_LEVEL_HEIGHT);
+            goto END_DRAW;
+        }
+        if (mList.empty())
+        {
+            drawText(NEXT_LEVEL_TEXT, NEXT_LEVEL_X_POS, NEXT_LEVEL_Y_POS, NEXT_LEVEL_WIDTH, NEXT_LEVEL_HEIGHT);
+            goto END_DRAW;
+        }
+
+    }
 
     mspBackImg->Draw();
-    mspYesNoBox->Draw();
-    /*for (auto& e : mList)
+    drawInGmaeText(GAME_LEVEL_TEXT, mCurGameLevel, LEVEL_TEXT_X_POS, LEVEL_TEXT_Y_POS, LEVEL_TEXT_WIDTH, LEVEL_TEXT_HEIGHT);
+    drawInGmaeText(TRIAL_COUNT_TEXT, mLeftFilpCount, TRIAL_COUNT_TEXT_X_POS, TRIAL_COUNT_TEXT_Y_POS, TRIAL_COUNT_TEXT_WIDTH, TRIAL_COUNT_TEXT_HEIGHT);
+    for (auto& e : mList)
     {
         e->Draw();
-    }*/
+    }
 
 
 END_DRAW:
@@ -51,6 +79,9 @@ END_DRAW:
 
 void CardGameManager::Release()
 {
+    mcpBrush.Reset();
+    mcpDwriteTextFormat.Reset();
+    mcpDwriteFactory.Reset();
     mspBackImg.reset();
     mspYesNoBox.reset();
     mspStartGameMenu.reset();
@@ -98,8 +129,11 @@ void CardGameManager::OnClick(D2D1_POINT_2F point)
         IfStartBtnClicked(point);
         return;
     }
-
-    IfYesNoBtnClicked(point);
+    if (mBIsYesNoBoxPresent)
+    {
+        IfYesNoBtnClicked(point);
+        return;
+    }
 
     Card* pCurCard = nullptr;
     for (auto& e : mList)
@@ -120,12 +154,55 @@ void CardGameManager::OnClick(D2D1_POINT_2F point)
         else
         {
             Render();
-            if (EraseIfMatched(&pCurCard, &mpPrevCard)){}
+            if (pCurCard != mpPrevCard) { --mLeftFilpCount; }
+            if (EraseIfMatched(&pCurCard, &mpPrevCard)){ }
             else { RollBack(&pCurCard, &mpPrevCard); }
+
+            if (mList.empty() || mLeftFilpCount <= 0) { mBIsYesNoBoxPresent = true; }
         }
 
     }
 
+}
+
+HRESULT CardGameManager::createDeviceIndependentResources()
+{
+    HRESULT hr;
+    const WCHAR MSC_FONTNAME[] = L"Consolas";
+    const FLOAT MSC_FONT_SIZE = 50;
+
+    hr = DWriteCreateFactory(
+        DWRITE_FACTORY_TYPE_SHARED,
+        __uuidof(mcpDwriteFactory.Get()),
+        reinterpret_cast<IUnknown**>(mcpDwriteFactory.GetAddressOf())
+    );
+
+    if (FAILED(hr)) { assert(false); return hr; }
+
+    hr = mcpDwriteFactory->CreateTextFormat(
+        MSC_FONTNAME,
+        NULL,
+        DWRITE_FONT_WEIGHT_NORMAL,
+        DWRITE_FONT_STYLE_NORMAL,
+        DWRITE_FONT_STRETCH_NORMAL,
+        MSC_FONT_SIZE,
+        L"en-us",
+        mcpDwriteTextFormat.GetAddressOf()
+    );
+    if (FAILED(hr)) { assert(false); return hr; }
+
+
+    mcpDwriteTextFormat->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_LEADING);
+    if (FAILED(hr)) { assert(false); return hr; }
+
+
+    mcpDwriteTextFormat->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_NEAR);
+    if (FAILED(hr)) { assert(false); return hr; }
+
+
+    mcpRenderTarget->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::Black), mcpBrush.GetAddressOf());
+
+    return S_OK;
 }
 
 void CardGameManager::initCardPos()
@@ -193,10 +270,6 @@ bool CardGameManager::EraseIfMatched(Card** ppCurCard, Card** ppPrevCard)
             }
         }
         *ppPrevCard = nullptr;
-        if (mList.empty())
-        {
-            DestroyWindow(mHwnd);
-        }
         return true;
     }
 
@@ -237,14 +310,25 @@ void CardGameManager::IfStartBtnClicked(D2D1_POINT_2F point)
 void CardGameManager::IfYesNoBtnClicked(D2D1_POINT_2F point)
 {
     mspYesNoBox->OnClicked(point);
-    if (mspYesNoBox->IsYesClicked())
-    {
-        MessageBoxA(nullptr, "Clicked!!!", "YES", MB_OK);
-        return;
-    }
     if (mspYesNoBox->IsNoClicked())
     {
         DestroyWindow(mHwnd);
+        return;
+    }
+    if (mspYesNoBox->IsYesClicked())
+    {
+        if (mList.empty())
+        {
+            ++mCurGameLevel;
+        }
+        if (mCurGameLevel == MAX_GAME_LEVEL + 1)
+        {
+            mCurGameLevel = 1;
+        }
+        mList.clear();
+        initCardPos();
+        mLeftFilpCount = FIRST_TRIAL_COUNT - (SUBTRACT_CPEFFICIENT * (mCurGameLevel - 1));
+        mBIsYesNoBoxPresent = false;
         return;
     }
 }
